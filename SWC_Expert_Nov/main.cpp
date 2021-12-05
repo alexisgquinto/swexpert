@@ -10,7 +10,7 @@
 using namespace std;
 
 #define MAX_SIZE 50
-#define COMPRESSION_SIZE 150000
+#define COMPRESSION_SIZE 15000000
 
 char m_graph[MAX_SIZE][MAX_SIZE];
 char graph[MAX_SIZE][MAX_SIZE];
@@ -18,70 +18,95 @@ char m_data[COMPRESSION_SIZE];
 char m_result[MAX_SIZE][MAX_SIZE];
 
 /* Solution starts here */
+void print(char canvas[MAX_SIZE][MAX_SIZE]) {
+    for (int i = 0; i < MAX_SIZE; ++i) {
+        for (int j = 0; j < MAX_SIZE; ++j) {
+            printf("%d", canvas[i][j]);
+        }
+        printf("\n");
+    }
+}
 
 short getHorizontalLength(short r, short c, char gmap[MAX_SIZE][MAX_SIZE]) {
-    short length = 1;
-    short tmp = 0;
-    while (gmap[r][c + tmp + 1] == 1) {
-        gmap[r][c + tmp] = 0;
+    short length = 0;
+    while (gmap[r][c + length] == 1) {
         ++length;
-        ++tmp;
     }
     return length;
 }
 
 short getVerticalLength(short r, short c, char gmap[MAX_SIZE][MAX_SIZE]) {
-    short length = 1;
-    short tmp = 0;
-    while (gmap[r + tmp + 1][c] == 1) {
-        gmap[r + tmp][c] = 0;
+    short length = 0;
+    while (gmap[r + length][c] == 1) {
         ++length;
-        ++tmp;
     }
     
     return length;
 }
 
+void clearLine(short r, short c, short len, char canvas[MAX_SIZE][MAX_SIZE]) {
+    int counter = 0;
+    if (len > MAX_SIZE) { // vertical
+        len -= MAX_SIZE;
+        while (counter < len) {
+            canvas[r + counter][c] = 0;
+            ++counter;
+        }
+    } else { // horizontal
+        while (counter < len) {
+            canvas[r][c + counter] = 0;
+            ++counter;
+        }
+    }
+}
+
 void compress(char f_graph[MAX_SIZE][MAX_SIZE], char f_data[COMPRESSION_SIZE]) {
-    int index = 0;
-    for (int i = 0; i < MAX_SIZE; ++i) {
-        for (int j = 0; j < MAX_SIZE; ++j) {
+    /*
+     Sample pointer hack:
+     char temp[20];
+    
+    short a = 1;
+    short b = 1;
+    short c = 7;
+    
+    short *pointer = (short*)(&temp[3]);
+    *pointer = a;
+    pointer += 2;
+    
+    *pointer = b;
+    pointer += 2;
+    
+    *pointer = c;
+    
+    short *newpointer = (short*)(&temp[3]);
+    printf("%d %d %d", *newpointer, *(newpointer+2), *(newpointer+4));*/
+    
+    short index = 0;
+    for (short i = 0; i < MAX_SIZE; ++i) {
+        for (short j = 0; j < MAX_SIZE; ++j) {
             if (f_graph[i][j] == 1) {
                 short r = i;
                 short c = j;
                 short lengthH = getHorizontalLength(r, c, f_graph);
-                short lengthV = getVerticalLength(r, c, f_graph) + MAX_SIZE;
-                f_graph[r][c] = 0;
+                short lengthV = getVerticalLength(r, c, f_graph);
+                short finalLength = lengthH > lengthV ? lengthH : lengthV + MAX_SIZE;
 
                 //save it to the f_data
-                short *shortPointer;
-                if (lengthH > 1) {
-                    shortPointer = (short*)(&f_data[index]);
-                    *shortPointer = r;
-                    index += 2;
-                    
-                    shortPointer = (short*)(&f_data[index]);
-                    *shortPointer = c;
-                    index += 2;
-                    
-                    shortPointer = (short*)(&f_data[index]);
-                    *shortPointer = lengthH;
-                    index += 2;
-                }
+                short *shortPointer = (short*)(&f_data[index]);
+                *shortPointer = r;
                 
-                if (lengthV > 1 || (lengthH == 1 && lengthV == 1)) {
-                    shortPointer = (short*)(&f_data[index]);
-                    *shortPointer = r;
-                    index += 2;
-                    
-                    shortPointer = (short*)(&f_data[index]);
-                    *shortPointer = c;
-                    index += 2;
-                    
-                    shortPointer = (short*)(&f_data[index]);
-                    *shortPointer = lengthV;
-                    index += 2;
-                }
+                shortPointer += 2;
+                *shortPointer = c;
+                
+                shortPointer += 2;
+                *shortPointer = finalLength;
+                
+                index += 6;
+                
+                printf("Compressing[%d]: %d %d %d\n", index - 6, r, c, finalLength > MAX_SIZE ? finalLength - MAX_SIZE : finalLength);
+                
+                clearLine(r, c, finalLength, f_graph);
+                //print(f_graph);
             }
         }
     }
@@ -103,27 +128,18 @@ void drawVertical(short r, short c, short length, char f_result[MAX_SIZE][MAX_SI
     }
 }
 
-void print(char canvas[MAX_SIZE][MAX_SIZE]) {
-    for (int i = 0; i < MAX_SIZE; ++i) {
-        for (int j = 0; j < MAX_SIZE; ++j) {
-            printf("%d", canvas[i][j]);
-        }
-        printf("\n");
-    }
-}
-
 void decompress(char f_result[MAX_SIZE][MAX_SIZE], char f_data[COMPRESSION_SIZE]) {
     for (int i = 0; i < COMPRESSION_SIZE; i += 6) {
-        short *pointer1 = (short*)(&f_data[i + 0]);
-        short r = *pointer1;
+        short *pointer = (short*)(&f_data[i]);
+        short r = *pointer;
         
-        short *pointer2 = (short*)(&f_data[i + 2]);
-        short c = *pointer2;
+        pointer += 2;
+        short c = *pointer;
         
-        short *pointer3 = (short*)(&f_data[i + 4]);
-        short length = *pointer3;
+        pointer += 2;
+        short length = *pointer;
         
-        printf("%d %d %d\n", r, c, length > MAX_SIZE ? length - MAX_SIZE : length);
+        printf("Decompressing[%d]: %d %d %d\n", i, r, c, length > MAX_SIZE ? length - MAX_SIZE : length);
         
         if (length <= 0) {
             break;
@@ -133,7 +149,7 @@ void decompress(char f_result[MAX_SIZE][MAX_SIZE], char f_data[COMPRESSION_SIZE]
             drawHorizontal(r, c, length, f_result);
         }
         
-        print(f_result);
+        //print(f_result);
     }
 }
 /* Solution ends here */
