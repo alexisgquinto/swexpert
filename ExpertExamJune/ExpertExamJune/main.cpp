@@ -221,7 +221,7 @@ void test(int **tanks, int **base, int *arrange) {
     
     while(base2->size > 0) {
         Tank* tank = base2->removeFromHeap();
-        arrange[tank->index] = 0;
+        arrange[tank->index] = 2;
     }
 }
 
