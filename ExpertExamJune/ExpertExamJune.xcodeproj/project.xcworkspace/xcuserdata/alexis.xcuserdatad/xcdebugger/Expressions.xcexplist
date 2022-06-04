@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VariablesViewState
+   version = "1.0">
+   <ContextStates>
+      <ContextState
+         contextName = "test(int**, int**, int*):main.cpp">
+         <PersistentStrings>
+            <PersistentString
+               value = "priority[2]">
+            </PersistentString>
+            <PersistentString
+               value = "newTank-&gt;basePriority[1]">
+            </PersistentString>
+            <PersistentString
+               value = "newTank-&gt;basePriority[2]">
+            </PersistentString>
+            <PersistentString
+               value = "priority[1]">
+            </PersistentString>
+            <PersistentString
+               value = "newTank-&gt;basePriority[0]">
+            </PersistentString>
+            <PersistentString
+               value = "newTank-&gt;currBase">
+            </PersistentString>
+            <PersistentString
+               value = "priority[0]">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "main:main.cpp">
+      </ContextState>
+   </ContextStates>
+</VariablesViewState>
