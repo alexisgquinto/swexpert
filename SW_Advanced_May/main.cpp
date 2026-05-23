@@ -52,9 +52,9 @@ public:
     }
 };
 
-int solve(vector<Loc> &locations);
-void printLocations(vector<Loc> &locations);
-int calculateDistance(Loc a, Loc b);
+int solve(const vector<Loc> &locations);
+void printLocations(const vector<Loc> &locations);
+int calculateDistance(const Loc &a, const Loc &b);
 
 /*
 2
@@ -97,16 +97,16 @@ int main() {
     return 0;
 }
 
-int calculateDistance(Loc a, Loc b) { return abs(b.r - a.r) + abs(b.c - a.c); }
+int calculateDistance(const Loc &a, const Loc &b) { return abs(b.r - a.r) + abs(b.c - a.c); }
 
-void printLocations(vector<Loc> &locations) {
+void printLocations(const vector<Loc> &locations) {
     for (auto loc : locations) {
         cout << "Loc("<<loc.r << "," << loc.c << "), Dir ("<< loc.dir << "), Dist("<< loc.distance << ");" << endl;
     }
     cout << endl;
 }
 
-int solve(vector<Loc> &locations) {
+int solve(const vector<Loc> &locations) {
     // printLocations(locations);
 
     queue<State> q;
