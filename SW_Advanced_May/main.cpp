@@ -3,6 +3,8 @@
 #include <queue>
 #include <vector>
 
+#define MAX_SEEDS 15
+#define GRID_MAX_SIZE 15
 #define GRID_LOWEST_BOUND 0
 #define GRID_HIGHEST_BOUND 14
 #define HOME_LOC_R 1
@@ -110,10 +112,14 @@ int solve(const vector<Loc> &locations) {
     // printLocations(locations);
 
     queue<State> q;
+    bool isVisited [MAX_SEEDS][GRID_MAX_SIZE][GRID_MAX_SIZE][GRID_MAX_SIZE][GRID_MAX_SIZE] {};
+    
     int seedInitialIdx = 1;
     Loc mouseInitialLoc = locations.at(0);
     Loc catInitialLoc = locations.at(locations.size() - 1);
     q.push(State(seedInitialIdx, mouseInitialLoc, catInitialLoc));
+    
+    isVisited[seedInitialIdx][mouseInitialLoc.r][mouseInitialLoc.c][catInitialLoc.r][catInitialLoc.c] = true;
 
     while (!q.empty()) {
         State state = q.front();
@@ -226,7 +232,10 @@ int solve(const vector<Loc> &locations) {
                     
                 // add the state to qs
                 if (nextMouseLoc.r != nextCatLocation.r || nextMouseLoc.c != nextCatLocation.c) {
-                    q.push(State(nextSeedIdx, nextMouseLoc, nextCatLocation));
+                    if (!isVisited[nextSeedIdx][nextMouseLoc.r][nextMouseLoc.c][nextCatLocation.r][nextCatLocation.c]) {
+                        isVisited[nextSeedIdx][nextMouseLoc.r][nextMouseLoc.c][nextCatLocation.r][nextCatLocation.c] = true;
+                        q.push(State(nextSeedIdx, nextMouseLoc, nextCatLocation));
+                    }
                 }
             }
         }
